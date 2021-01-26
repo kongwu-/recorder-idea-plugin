@@ -10,10 +10,12 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="org.jetbrains.plugins.template.services.MyApplicationService"/>
         <projectService serviceImplementation="org.jetbrains.plugins.template.services.MyProjectService"/>
+
     </extensions>
 
     <applicationListeners>
         <listener class="org.jetbrains.plugins.template.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
+
 </idea-plugin>
