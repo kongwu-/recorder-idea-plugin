@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.kongwu.recorderideaplugin.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.kongwu.recorderideaplugin.MyBundle
 
 class MyApplicationService {
 
