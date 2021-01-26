@@ -1,7 +1,7 @@
-package org.jetbrains.plugins.template.services
+package com.github.kongwu.recorderideaplugin.services
 
+import com.github.kongwu.recorderideaplugin.MyBundle
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.template.MyBundle
 
 class MyProjectService(project: Project) {
 
