@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Premain-Class: com.github.kongwu.TestAgent
+Agent-Class:  com.github.kongwu.TestAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true

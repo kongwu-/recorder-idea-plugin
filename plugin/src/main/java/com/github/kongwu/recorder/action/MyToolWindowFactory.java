@@ -32,8 +32,9 @@ public class MyToolWindowFactory extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-        PsiElement sourceElement = JavaPsiFacade.getInstance(project).findClass("java.util.ArrayList", GlobalSearchScope.allScope(project)).getSourceElement();
-        OpenFileDescriptor openFileDescriptor = new OpenFileDescriptor(project, sourceElement.getContainingFile().getVirtualFile());
+        //注意，一定要NavigationElement
+        PsiElement sourceElement = JavaPsiFacade.getInstance(project).findClass("marksweepgc.MarkSweepGC", GlobalSearchScope.everythingScope(project)).getNavigationElement();
+        OpenFileDescriptor openFileDescriptor = new OpenFileDescriptor(project, sourceElement.getContainingFile().getVirtualFile(),49-1,0);
         fileEditorManager.openTextEditor(openFileDescriptor,true);
 //
 //        final ExecutionManagerImpl executionManager = ExecutionManagerImpl.getInstance(project);
