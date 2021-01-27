@@ -1,0 +1,9 @@
+subprojects {
+    group 'com.github.kongwu'
+    version '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}

@@ -1,0 +1,3 @@
+rootProject.name = 'recorder-idea-plugin'
+
+include 'agent','plugin'
