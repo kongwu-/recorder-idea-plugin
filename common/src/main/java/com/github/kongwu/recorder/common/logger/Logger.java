@@ -1,5 +1,6 @@
 package com.github.kongwu.recorder.common.logger;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.*;
@@ -44,5 +45,10 @@ public class Logger {
     public static void main(String[] args) {
         Logger logger = Logger.getLogger(ArrayList.class);
         logger.info("hhh");
+    }
+
+    public void error(String msg, Throwable e) {
+        String stackTrace = ExceptionUtils.getStackTrace(e);
+        append(msg+" : "+stackTrace);
     }
 }

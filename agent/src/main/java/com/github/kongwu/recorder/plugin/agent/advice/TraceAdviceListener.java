@@ -1,15 +1,32 @@
 package com.github.kongwu.recorder.plugin.agent.advice;
 
+import com.github.kongwu.recorder.common.logger.Logger;
+import com.github.kongwu.recorder.plugin.agent.result.DumpTraceResultResolver;
+import com.github.kongwu.recorder.plugin.agent.result.TraceResultResolver;
 import com.github.kongwu.recorder.plugin.agent.model.*;
 import com.github.kongwu.recorder.plugin.agent.utils.ThreadLocalWatch;
 
-import java.util.List;
-
 public class TraceAdviceListener implements AdviceListener{
+
+    private static Logger logger = Logger.getLogger(TraceAdviceListener.class);
 
     protected final ThreadLocalWatch threadLocalWatch = new ThreadLocalWatch();
 
     protected final ThreadLocal<TraceEntity> threadBoundEntity = new ThreadLocal<TraceEntity>();
+
+    protected TraceResultResolver traceResultResolver;
+
+    public TraceResultResolver getTraceResultResolver() {
+        return traceResultResolver;
+    }
+
+    public void setTraceResultResolver(TraceResultResolver traceResultResolver) {
+        this.traceResultResolver = traceResultResolver;
+    }
+
+    public TraceAdviceListener() {
+        this.traceResultResolver = new DumpTraceResultResolver();
+    }
 
     @Override
     public long id() {
@@ -92,42 +109,15 @@ public class TraceAdviceListener implements AdviceListener{
         //通过深度来判断，是否完全退出trace的入口方法
         if (--traceEntity.deep == 0) {
             try {
-                dump();
+                traceResultResolver.resolve(traceEntity.tree);
             } catch (Throwable e) {
-                e.printStackTrace();
-//                logger.warn("trace failed.", e);
-//                process.end(1, "trace failed, condition is: " + command.getConditionExpress() + ", " + e.getMessage()
-//                        + ", visit " + LogUtil.loggingFile() + " for more details.");
+                logger.error("resolve result failed!",e);
             } finally {
                 threadBoundEntity.remove();
             }
         }
     }
 
-    private void dump(){
-        TraceEntity traceEntity = threadLocalTraceEntity();
-        TraceTree tree = traceEntity.tree;
-        TraceNode root = tree.getRoot();
-        recursive("",root);
-    }
 
-    private void recursive(String prefix,TraceNode node){
-        List<TraceNode> children = node.children;
-        if(children != null){
-            for (TraceNode child : children) {
-                if(child instanceof MethodNode){
-                    MethodNode methodNode = (MethodNode)child;
-                    System.out.println(prefix+methodNode.getClassName()+":"+methodNode.getMethodName()+":"+methodNode.getLineNumber()+ (methodNode.getThrow()!=null&&methodNode.getThrow() ?" :throwExp":""));
-                }else
-                if(child instanceof ThrowNode){
-                    ThrowNode throwNode = (ThrowNode)child;
-                    System.out.println(prefix+throwNode.getMessage()+":"+throwNode.getLineNumber());
-                }else{
-
-                }
-                recursive(prefix+"  ",child);
-            }
-        }
-    }
 
 }

@@ -16,6 +16,7 @@ import com.alibaba.deps.org.objectweb.asm.Opcodes;
 import com.alibaba.deps.org.objectweb.asm.Type;
 import com.alibaba.deps.org.objectweb.asm.tree.ClassNode;
 import com.alibaba.deps.org.objectweb.asm.tree.MethodNode;
+import com.github.kongwu.recorder.common.logger.Logger;
 import com.github.kongwu.recorder.plugin.agent.interceptor.SpyInterceptors;
 import com.github.kongwu.recorder.plugin.agent.test.Sample;
 
@@ -32,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Enhancer implements ClassFileTransformer {
 
     private static final Map<Class,Boolean> enhancedClasses = new ConcurrentHashMap<>();
+
+    private static final Logger logger = Logger.getLogger(Enhancer.class);
 
     private String className;
 
@@ -98,28 +101,8 @@ public class Enhancer implements ClassFileTransformer {
 
         for (MethodNode methodNode : matchedMethods) {
             if (AsmUtils.isNative(methodNode)) {
-//                System.out.println("ignore native method: {}",
-//                        AsmUtils.methodDeclaration(Type.getObjectType(classNode.name), methodNode));
                 continue;
             }
-            // 先查找是否有 atBeforeInvoke 函数，如果有，则说明已经有trace了，则直接不再尝试增强，直接插入 listener
-//            if(AsmUtils.containsMethodInsnNode(methodNode, Type.getInternalName(SpyAPI.class), "atBeforeInvoke")) {
-//                for (AbstractInsnNode insnNode = methodNode.instructions.getFirst(); insnNode != null; insnNode = insnNode
-//                        .getNext()) {
-//                    if (insnNode instanceof MethodInsnNode) {
-//                        final MethodInsnNode methodInsnNode = (MethodInsnNode) insnNode;
-//                        if(methodInsnNode.owner.startsWith("java/")) {
-//                            continue;
-//                        }
-//                        // 原始类型的box类型相关的都跳过
-//                        if(AsmOpUtils.isBoxType(Type.getObjectType(methodInsnNode.owner))) {
-//                            continue;
-//                        }
-//                        AdviceListenerManager.registerTraceAdviceListener(inClassLoader, className,
-//                                methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc, listener);
-//                    }
-//                }
-//            }else {
             if(AsmUtils.containsMethodInsnNode(methodNode, Type.getInternalName(SpyAPI.class), "atBeforeInvoke")){
                 continue;
             }
@@ -127,28 +110,12 @@ public class Enhancer implements ClassFileTransformer {
                 for (InterceptorProcessor interceptor : interceptorProcessors) {
                     try {
                         List<Location> locations = interceptor.process(methodProcessor);
-//                        for (Location location : locations) {
-//                            if (location instanceof MethodInsnNodeWare) {
-//                                MethodInsnNodeWare methodInsnNodeWare = (MethodInsnNodeWare) location;
-//                                MethodInsnNode methodInsnNode = methodInsnNodeWare.methodInsnNode();
-//
-//                                AdviceListenerManager.registerTraceAdviceListener(inClassLoader, className,
-//                                        methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc, listener);
-//                            }
-//                        }
 
                     } catch (Throwable e) {
-                        System.out.println("baocuole");
-                        e.printStackTrace();
-//                        logger.error("enhancer error, class: {}, method: {}, interceptor: {}", classNode.name, methodNode.name, interceptor.getClass().getName(), e);
+                        logger.error(String.format("enhancer error, class: %s, method: %s, interceptor: %s", classNode.name, methodNode.name, interceptor.getClass().getName()), e);
                     }
                 }
 //            }
-
-//            // enter/exist 总是要插入 listener
-//            AdviceListenerManager.registerAdviceListener(classLoader, className, methodNode.name, methodNode.desc,
-//                    listener);
-//            affect.addMethodAndCount(inClassLoader, className, methodNode.name, methodNode.desc);
         }
 
         // https://github.com/alibaba/arthas/issues/1223 , V1_5 的major version是49
@@ -163,7 +130,7 @@ public class Enhancer implements ClassFileTransformer {
     public static synchronized void enhance(ClassLoader classLoader,Class clazz,boolean bootstrap){
 
         if(enhancedClasses.containsKey(clazz)){
-            System.out.println("Skip repetitive enhancement!"+clazz.getName());
+            System.out.println("Skip duplicated enhancement!"+clazz.getName());
             return;
         }
         System.out.println("enhancing class: "+clazz.getName());

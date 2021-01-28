@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+compileJava.options.encoding = 'UTF-8'
+dependencies {
+    api group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    api group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+}
