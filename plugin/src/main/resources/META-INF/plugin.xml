@@ -21,7 +21,7 @@
         <!-- Add your actions here -->
         <group text="MyNavBarGroup">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <action class="com.github.kongwu.recorder.MyToolWindowFactory" text="show running process" icon="/META-INF/icon.svg"/>
+            <action class="com.github.kongwu.recorder.plugin.action.TraceMethodAction" text="show running process" icon="/META-INF/icon.svg"/>
         </group>
     </actions>
 </idea-plugin>
