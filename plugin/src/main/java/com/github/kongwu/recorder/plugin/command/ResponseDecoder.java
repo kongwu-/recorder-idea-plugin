@@ -1,5 +1,4 @@
 package com.github.kongwu.recorder.plugin.command;
 
-public interface TunnelCommandResolver {
-
+public class ResponseDecoder {
 }
