@@ -6,6 +6,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LoggingHandler;
 
 public class AgentServer {
@@ -33,6 +34,7 @@ public class AgentServer {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
                     ch.pipeline().addFirst(new LoggingHandler());
+                    ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,Integer.BYTES,0,Integer.BYTES));
                     ch.pipeline().addLast(new RequestDecoder());
                     ch.pipeline().addLast(new ResponseEncoder());
                     ch.pipeline().addLast(new AgentServerHandler(AgentServer.this));

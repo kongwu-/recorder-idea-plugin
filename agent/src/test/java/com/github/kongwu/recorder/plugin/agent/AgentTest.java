@@ -54,8 +54,10 @@ public class AgentTest {
         Channel channel = bootstrap.connect("127.0.0.1", PORT).sync().channel();
 
         ByteBuf byteBuf = channel.alloc().buffer();
+        byte[] bodyBytes = "com.github.kongwu.recorder.plugin.agent.Sample".getBytes(Constants.ENCODING);
+        byteBuf.writeInt(bodyBytes.length+1);
         byteBuf.writeByte(PacketType.REQUEST_TRACE);
-        byteBuf.writeBytes("com.github.kongwu.recorder.plugin.agent.Sample".getBytes(Constants.ENCODING));
+        byteBuf.writeBytes(bodyBytes);
         channel.writeAndFlush(byteBuf);
     }
 }
