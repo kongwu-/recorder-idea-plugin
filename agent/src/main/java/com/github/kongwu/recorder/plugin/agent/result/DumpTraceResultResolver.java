@@ -12,24 +12,26 @@ public class DumpTraceResultResolver implements TraceResultResolver {
 
     private void dump(TraceTree tree){
         TraceNode root = tree.getRoot();
-        recursive("",root);
+        StringBuilder sb = new StringBuilder();
+        recursive("",sb,root);
+        System.err.println(sb);
     }
 
-    private void recursive(String prefix,TraceNode node){
+    private void recursive(String prefix,StringBuilder sb,TraceNode node){
         List<TraceNode> children = node.children;
         if(children != null){
             for (TraceNode child : children) {
                 if(child instanceof MethodNode){
                     MethodNode methodNode = (MethodNode)child;
-                    System.out.println(prefix+methodNode.getClassName()+":"+methodNode.getMethodName()+":"+methodNode.getLineNumber()+ (methodNode.getThrow()!=null&&methodNode.getThrow() ?" :throwExp":""));
+                    sb.append(prefix+methodNode.getClassName()+":"+methodNode.getMethodName()+":"+methodNode.getLineNumber()+ (methodNode.getThrow()!=null&&methodNode.getThrow() ?" :throwExp":""));
+                    sb.append("\n");
                 }else
                 if(child instanceof ThrowNode){
                     ThrowNode throwNode = (ThrowNode)child;
-                    System.out.println(prefix+throwNode.getMessage()+":"+throwNode.getLineNumber());
-                }else{
-
+                    sb.append(prefix+throwNode.getMessage()+":"+throwNode.getLineNumber());
+                    sb.append("\n");
                 }
-                recursive(prefix+"  ",child);
+                recursive(prefix+"  ",sb,child);
             }
         }
     }

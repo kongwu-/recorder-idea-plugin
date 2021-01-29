@@ -9,7 +9,6 @@ import com.alibaba.bytekit.asm.location.filter.GroupLocationFilter;
 import com.alibaba.bytekit.asm.location.filter.InvokeCheckLocationFilter;
 import com.alibaba.bytekit.asm.location.filter.InvokeContainLocationFilter;
 import com.alibaba.bytekit.asm.location.filter.LocationFilter;
-import com.alibaba.bytekit.utils.AgentUtils;
 import com.alibaba.bytekit.utils.AsmUtils;
 import com.alibaba.deps.org.objectweb.asm.ClassReader;
 import com.alibaba.deps.org.objectweb.asm.Opcodes;
@@ -18,7 +17,6 @@ import com.alibaba.deps.org.objectweb.asm.tree.ClassNode;
 import com.alibaba.deps.org.objectweb.asm.tree.MethodNode;
 import com.github.kongwu.recorder.common.logger.Logger;
 import com.github.kongwu.recorder.plugin.agent.interceptor.SpyInterceptors;
-import com.github.kongwu.recorder.plugin.agent.test.Sample;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -32,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Enhancer implements ClassFileTransformer {
 
-    private static final Map<Class,Boolean> enhancedClasses = new ConcurrentHashMap<>();
+    private static final Map<String,Boolean> enhancedClasses = new ConcurrentHashMap<>();
 
     private static final Logger logger = Logger.getLogger(Enhancer.class);
 
@@ -46,6 +44,7 @@ public class Enhancer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+        className = className.replace("/",".");
         if(!className.equals(this.className)){
             return null;
         }
@@ -115,7 +114,6 @@ public class Enhancer implements ClassFileTransformer {
                         logger.error(String.format("enhancer error, class: %s, method: %s, interceptor: %s", classNode.name, methodNode.name, interceptor.getClass().getName()), e);
                     }
                 }
-//            }
         }
 
         // https://github.com/alibaba/arthas/issues/1223 , V1_5 的major version是49
@@ -127,95 +125,30 @@ public class Enhancer implements ClassFileTransformer {
         return enhanceClassByteArray;
     }
 
-    public static synchronized void enhance(ClassLoader classLoader,Class clazz,boolean bootstrap){
-
-        if(enhancedClasses.containsKey(clazz)){
-            System.out.println("Skip duplicated enhancement!"+clazz.getName());
+    public static synchronized void enhance(String traceClassName,boolean bootstrap){
+        if(enhancedClasses.containsKey(traceClassName)){
+            //Skip duplicated enhancement
+//            logger.info("Skip duplicated enhancement[%s]",traceClassName);
             return;
         }
-        System.out.println("enhancing class: "+clazz.getName());
-        Enhancer enhancer = new Enhancer();
-        enhancer.className = clazz.getName().replace(".","/");
-        enhancer.bootstrap = bootstrap;
-        Instrumentation instrumentation = AgentUtils.install();
-
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                for (int i = 0; i < 100; i++) {
-//                    System.out.println("$$$  "+sample.randomStr(10));
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }).start();
-
-
-        instrumentation.addTransformer(enhancer,true);
         try {
-            instrumentation.retransformClasses(clazz);
-        } catch (UnmodifiableClassException e) {
-            e.printStackTrace();
+            Enhancer enhancer = new Enhancer();
+            logger.info("enhancing class: %s", traceClassName);
+            enhancer.className = traceClassName;
+            enhancer.bootstrap = bootstrap;
+            Instrumentation instrumentation = AgentHolder.getInstrumentation();
+
+            instrumentation.addTransformer(enhancer,true);
+
+            Class<?> traceClass = Class.forName(traceClassName);
+            instrumentation.retransformClasses(traceClass);
+            enhancedClasses.put(traceClassName,true);
+            instrumentation.removeTransformer(enhancer);
+        } catch (UnmodifiableClassException | ClassNotFoundException e) {
+            logger.error("re transform failed!",e);
         }
-        enhancedClasses.put(clazz,true);
-        instrumentation.removeTransformer(enhancer);
 
-    }
 
-    public static void main(String[] args) throws Exception {
-        Sample sample = new Sample();
-        enhance(Thread.currentThread().getContextClassLoader(),Sample.class,true);
-        sample.putCache("aa","bb");
-//
-//        // 启动Sample，不断执行
-//        final Sample sample = new Sample();
-//        Thread t = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                for (int i = 0; i < 100; ++i) {
-//                    try {
-//                        TimeUnit.SECONDS.sleep(3);
-//                        String result = sample.randomStr(11);
-//                        System.out.println("call hello result: " + result);
-//                    } catch (Throwable e) {
-//                        // ignore
-//                        System.out.println("call hello exception: " + e.getMessage());
-//                    }
-//                }
-//            }
-//        });
-//        t.start();
-//
-//        // 解析定义的 Interceptor类 和相关的注解
-//        DefaultInterceptorClassParser interceptorClassParser = new DefaultInterceptorClassParser();
-//        List<InterceptorProcessor> processors = interceptorClassParser.parse(SpyInterceptors.SpyInterceptor1.class);
-//
-//        // 加载字节码
-//        ClassNode classNode = AsmUtils.loadClass(Sample.class);
-//
-//        // 对加载到的字节码做增强处理
-//        for (MethodNode methodNode : classNode.methods) {
-//                MethodProcessor methodProcessor = new MethodProcessor(classNode, methodNode);
-//                for (InterceptorProcessor interceptor : processors) {
-//                    interceptor.process(methodProcessor);
-//                }
-//        }
-//
-//        // 获取增强后的字节码
-//        byte[] bytes = AsmUtils.toBytes(classNode);
-//
-////        System.out.println(Decompiler.decompile(bytes));
-//
-//        // 等待，查看未增强里的输出结果
-//        TimeUnit.SECONDS.sleep(10);
-//
-//        // 通过 reTransform 增强类
-//        AgentUtils.reTransform(Sample.class, bytes);
-//        System.in.read();
     }
 
     private boolean isIgnore(MethodNode methodNode) {

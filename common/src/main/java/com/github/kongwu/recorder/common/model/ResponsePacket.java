@@ -1,14 +1,15 @@
 package com.github.kongwu.recorder.common.model;
 
 public class ResponsePacket {
-    private String type;
+    private byte state;
+    private byte type;
     private String body;
 
-    public String getType() {
+    public byte getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(byte type) {
         this.type = type;
     }
 
@@ -17,6 +18,20 @@ public class ResponsePacket {
     }
 
     public void setBody(String body) {
+        this.body = body;
+    }
+
+    public byte getState() {
+        return state;
+    }
+
+    public void setState(byte state) {
+        this.state = state;
+    }
+
+    public ResponsePacket(byte state, byte type, String body) {
+        this.state = state;
+        this.type = type;
         this.body = body;
     }
 }

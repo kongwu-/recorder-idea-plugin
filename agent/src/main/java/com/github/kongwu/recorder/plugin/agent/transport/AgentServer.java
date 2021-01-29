@@ -1,86 +1,54 @@
 package com.github.kongwu.recorder.plugin.agent.transport;
 
 import com.github.kongwu.recorder.common.logger.Logger;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 
 public class AgentServer {
 
     private static final Logger logger = Logger.getLogger(AgentServer.class);
 
-    private boolean running = false;
+    private volatile boolean started = false;
 
-    private ServerSocket serverSocket;
+    private Channel acceptChannel;
 
-    private SocketChannel transportChannel;
+    private NioEventLoopGroup serverEventLoopGroup;
 
-    public void start(int port){
+    public void start(int port) {
         try {
-            if(running){
+            if (started) {
                 logger.info("Agent Server already in running state!");
                 return;
             }
-            serverSocket = new ServerSocket();
-            serverSocket.bind(new InetSocketAddress(port));
-            running = true;
-            AgentServerRunnable agentServerAcceptor = new AgentServerRunnable(serverSocket);
-            new Thread(agentServerAcceptor).start();
-            serverSocket.close();
-        } catch (IOException e) {
-            logger.error("server start failed!",e);
-        }
-    }
 
-    public void close(){
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-            logger.info("server close failed, ignore..",e);
-        }
-    }
-
-    public class AgentServerRunnable implements Runnable{
-
-        private Logger logger = Logger.getLogger(AgentServerRunnable.class);
-
-        private ServerSocket serverSocket;
-
-        public AgentServerRunnable(ServerSocket serverSocket) {
-            this.serverSocket = serverSocket;
-        }
-
-        private ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.BYTES);
-
-
-        @Override
-        public void run() {
-            try {
-                Socket socket = serverSocket.accept();
-                SocketChannel socketChannel = socket.getChannel();
-
-                while (lengthBuffer.hasRemaining()){
-                    socketChannel.read(lengthBuffer);
+            serverEventLoopGroup = new NioEventLoopGroup(1);
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.channel(NioServerSocketChannel.class);
+            serverBootstrap.group(serverEventLoopGroup);
+            serverBootstrap.childHandler(new ChannelInitializer() {
+                @Override
+                protected void initChannel(Channel ch) throws Exception {
+                    ch.pipeline().addFirst(new LoggingHandler());
+                    ch.pipeline().addLast(new RequestDecoder());
+                    ch.pipeline().addLast(new ResponseEncoder());
+                    ch.pipeline().addLast(new AgentServerHandler(AgentServer.this));
                 }
-                lengthBuffer.flip();
-                int length = lengthBuffer.getInt();
-                lengthBuffer.reset();
-                ByteBuffer requestBuffer = ByteBuffer.allocate(length);
-
-                while (requestBuffer.hasRemaining()){
-                    socketChannel.read(requestBuffer);
-                }
-                byte[] requestBodyBytes = requestBuffer.array();
-
-
-
-            } catch (IOException e) {
-                logger.error("server process failed!",e);
-            }
+            });
+            acceptChannel = serverBootstrap.bind(port).sync().channel();
+            started = true;
+        } catch (InterruptedException e) {
+            logger.error("server start failed!", e);
         }
     }
+
+    public void close() {
+        started = false;
+        serverEventLoopGroup.shutdownGracefully().syncUninterruptibly();
+        acceptChannel.close();
+    }
+
 }

@@ -28,6 +28,10 @@ public class TraceAdviceListener implements AdviceListener{
         this.traceResultResolver = new DumpTraceResultResolver();
     }
 
+    public TraceAdviceListener(TraceResultResolver traceResultResolver) {
+        this.traceResultResolver = traceResultResolver;
+    }
+
     @Override
     public long id() {
         return 0;
@@ -56,7 +60,6 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void afterReturning(Class<?> clazz, String methodName, String methodDesc, Object target, Object[] args, Object returnObject) throws Throwable {
-        System.out.println("after..."+threadLocalTraceEntity().deep);
         threadLocalTraceEntity().tree.end();
         finishing();
     }
@@ -100,7 +103,6 @@ public class TraceAdviceListener implements AdviceListener{
         }
         return traceEntity;
     }
-
 
     private void finishing() {
         // 本次调用的耗时
