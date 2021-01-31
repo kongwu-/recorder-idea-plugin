@@ -1,24 +1,24 @@
 package com.github.kongwu.recorder.common.model;
 
-public class ResponsePacket {
+public class ResponsePacket extends Packet {
+
     private byte state;
-    private byte type;
+
     private String body;
 
-    public byte getType() {
-        return type;
-    }
 
-    public void setType(byte type) {
-        this.type = type;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
+    public ResponsePacket(long id, byte state, String body) {
+        super(PacketConstant.WAY_RESPONSE,id);
+        this.state = state;
         this.body = body;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public byte getState() {
@@ -29,9 +29,11 @@ public class ResponsePacket {
         this.state = state;
     }
 
-    public ResponsePacket(byte state, byte type, String body) {
-        this.state = state;
-        this.type = type;
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
         this.body = body;
     }
 }

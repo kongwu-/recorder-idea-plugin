@@ -3,22 +3,35 @@ package com.github.kongwu.recorder.common.model;
 import java.nio.ByteBuffer;
 
 public class Packet {
-    private int length;
-    private ByteBuffer data;
+    protected byte way;
+    protected long id;
 
-    public int getLength() {
-        return length;
+    public Packet() {
     }
 
-    public void setLength(int length) {
-        this.length = length;
+    public Packet(byte way, long id) {
+        this.way = way;
+        this.id = id;
     }
 
-    public ByteBuffer getData() {
-        return data;
+    public Packet(byte way) {
+        this.way = way;
+        this.id = System.currentTimeMillis();
     }
 
-    public void setData(ByteBuffer data) {
-        this.data = data;
+    public byte getWay() {
+        return way;
+    }
+
+    public void setWay(byte way) {
+        this.way = way;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

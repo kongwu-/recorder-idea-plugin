@@ -16,4 +16,11 @@ public class AgentBootstrap {
         AgentHolder.setInstrumentation(instrumentation);
         logger.info("premain inject completed");
     }
+
+    public static void agentmain(String args, Instrumentation instrumentation){
+        AgentServer agentServer = new AgentServer();
+        agentServer.start(Integer.parseInt(args));
+        AgentHolder.setInstrumentation(instrumentation);
+        logger.info("premain inject completed");
+    }
 }

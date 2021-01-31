@@ -2,8 +2,10 @@ package com.github.kongwu.recorder.plugin.agent.result;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kongwu.recorder.common.logger.Logger;
-import com.github.kongwu.recorder.common.model.PacketType;
+import com.github.kongwu.recorder.common.model.PacketConstant;
+import com.github.kongwu.recorder.common.model.RequestPacket;
 import com.github.kongwu.recorder.common.model.ResponsePacket;
+import com.github.kongwu.recorder.plugin.agent.model.TraceResultConverter;
 import com.github.kongwu.recorder.plugin.agent.model.TraceTree;
 import io.netty.channel.Channel;
 
@@ -15,6 +17,8 @@ public class TunnelTraceResultResolver implements TraceResultResolver{
 
     private Channel channel;
 
+    private TraceResultConverter traceResultConverter = new TraceResultConverter();
+
     public TunnelTraceResultResolver(Channel channel) {
         this.channel = channel;
     }
@@ -22,10 +26,12 @@ public class TunnelTraceResultResolver implements TraceResultResolver{
     @Override
     public void resolve(TraceTree traceTree) {
         try {
-            String body = objectMapper.writeValueAsString(traceTree);
-            channel.writeAndFlush(new ResponsePacket(PacketType.RESPONSE_STATE_OK,PacketType.RESPONSE_TRACE,body));
+            logger.info("resolving trace result");
+            String body = objectMapper.writeValueAsString(traceResultConverter.convert(traceTree));
+            channel.writeAndFlush(new RequestPacket(PacketConstant.EVENT_TRACE,body));
+            //ignore reply...
         } catch (Exception e) {
-            logger.info("resolve result failed!",e);
+            logger.error("resolve result failed!",e);
         }
     }
 }

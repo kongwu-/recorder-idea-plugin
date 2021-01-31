@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>com.github.kongwu.recorder-idea-plugin</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>recorder-idea-plugin</id>
+    <name>recorder</name>
+    <vendor email="jiangxin1035@gmail.com" url="https://github.com/kongwu-">kongwu</vendor>
 
     <description><![CDATA[
     Enter short description for your plugin here.<br>
@@ -15,13 +15,18 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <projectService serviceImplementation="com.github.kongwu.recorder.plugin.service.AgentService"/>
+
+        <notificationGroup id="RecorderNotificationGroup" displayType="BALLOON"/>
+
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
-        <group text="MyNavBarGroup">
+        <group text="AgentContextGroup">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <action class="com.github.kongwu.recorder.plugin.action.TraceMethodAction" text="show running process" icon="/META-INF/icon.svg"/>
+            <action class="com.github.kongwu.recorder.plugin.action.TraceMethodAction" text="Trace the method" icon="/META-INF/icon.svg"/>
+            <action class="com.github.kongwu.recorder.plugin.action.ShowTabAction" text="Show tab" icon="/META-INF/icon.svg"/>
         </group>
     </actions>
 </idea-plugin>

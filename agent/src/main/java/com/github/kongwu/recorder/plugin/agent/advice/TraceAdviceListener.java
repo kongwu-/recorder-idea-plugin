@@ -73,6 +73,7 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void invokeBeforeTracing(String tracingClassName, String tracingMethodName, String tracingMethodDesc, int tracingLineNumber) throws Throwable {
+        logger.info("invokeBeforeTracing: "+tracingMethodName);
         TraceEntity traceEntity = threadLocalTraceEntity();
 
         traceEntity.deep++;

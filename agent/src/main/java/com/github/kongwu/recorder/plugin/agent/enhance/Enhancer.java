@@ -125,7 +125,7 @@ public class Enhancer implements ClassFileTransformer {
         return enhanceClassByteArray;
     }
 
-    public static synchronized void enhance(String traceClassName,boolean bootstrap){
+    public static synchronized void enhance(String traceClassName,boolean bootstrap) throws ClassNotFoundException {
         if(enhancedClasses.containsKey(traceClassName)){
             //Skip duplicated enhancement
 //            logger.info("Skip duplicated enhancement[%s]",traceClassName);
@@ -144,7 +144,7 @@ public class Enhancer implements ClassFileTransformer {
             instrumentation.retransformClasses(traceClass);
             enhancedClasses.put(traceClassName,true);
             instrumentation.removeTransformer(enhancer);
-        } catch (UnmodifiableClassException | ClassNotFoundException e) {
+        } catch (UnmodifiableClassException e) {
             logger.error("re transform failed!",e);
         }
 

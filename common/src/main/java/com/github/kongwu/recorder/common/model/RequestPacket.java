@@ -1,20 +1,28 @@
 package com.github.kongwu.recorder.common.model;
 
-public class RequestPacket {
-    private byte type;
+public class RequestPacket extends Packet{
+    private byte event;
+
     private String body;
 
-    public RequestPacket(byte type, String body) {
-        this.type = type;
+    public RequestPacket(byte event, String body) {
+        super(PacketConstant.WAY_REQUEST);
+        this.event = event;
         this.body = body;
     }
 
-    public byte getType() {
-        return type;
+    public RequestPacket(long id, byte event, String body) {
+        super(PacketConstant.WAY_REQUEST,id);
+        this.event = event;
+        this.body = body;
     }
 
-    public void setType(byte type) {
-        this.type = type;
+    public byte getEvent() {
+        return event;
+    }
+
+    public void setEvent(byte event) {
+        this.event = event;
     }
 
     public String getBody() {

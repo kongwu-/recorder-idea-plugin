@@ -2,15 +2,17 @@ package com.github.kongwu.recorder.plugin.agent;
 
 import com.alibaba.bytekit.utils.AgentUtils;
 import com.github.kongwu.recorder.common.constant.Constants;
-import com.github.kongwu.recorder.common.model.PacketType;
+import com.github.kongwu.recorder.common.model.PacketConstant;
+import com.github.kongwu.recorder.common.model.RequestPacket;
+import com.github.kongwu.recorder.common.model.ResponsePacket;
+import com.github.kongwu.recorder.common.transport.PacketDecoder;
+import com.github.kongwu.recorder.common.transport.PacketEncoder;
 import com.github.kongwu.recorder.plugin.agent.enhance.AgentHolder;
 import com.github.kongwu.recorder.plugin.agent.transport.AgentServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -49,15 +51,29 @@ public class AgentTest {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup);
         bootstrap.channel(NioSocketChannel.class);
-        bootstrap.handler(new LoggingHandler());
+        bootstrap.handler(new ChannelInitializer<Channel>() {
+            @Override
+            protected void initChannel(Channel ch) throws Exception {
+                ch.pipeline().addFirst(new LoggingHandler());
+                ch.pipeline().addLast(new PacketEncoder());
+                ch.pipeline().addLast(new PacketDecoder());
+                ch.pipeline().addLast(new SimpleChannelInboundHandler<Object>() {
+                    @Override
+                    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+                        if(msg instanceof RequestPacket){
+                            System.out.println(((RequestPacket) msg).getBody());
+                        }
+                        if(msg instanceof ResponsePacket){
+                            System.out.println("received msg");
+                        }
+                    }
+                });
+            }
+        });
 
         Channel channel = bootstrap.connect("127.0.0.1", PORT).sync().channel();
 
         ByteBuf byteBuf = channel.alloc().buffer();
-        byte[] bodyBytes = "com.github.kongwu.recorder.plugin.agent.Sample".getBytes(Constants.ENCODING);
-        byteBuf.writeInt(bodyBytes.length+1);
-        byteBuf.writeByte(PacketType.REQUEST_TRACE);
-        byteBuf.writeBytes(bodyBytes);
-        channel.writeAndFlush(byteBuf);
+        channel.writeAndFlush(new RequestPacket(PacketConstant.EVENT_TRACE,"com.github.kongwu.recorder.plugin.agent.Sample"));
     }
 }

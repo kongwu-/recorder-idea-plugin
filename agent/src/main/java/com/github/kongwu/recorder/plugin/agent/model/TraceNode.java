@@ -1,5 +1,7 @@
 package com.github.kongwu.recorder.plugin.agent.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.ArrayList;
 import java.util.List;
 

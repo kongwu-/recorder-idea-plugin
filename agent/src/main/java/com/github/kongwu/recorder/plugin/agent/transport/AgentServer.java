@@ -1,12 +1,13 @@
 package com.github.kongwu.recorder.plugin.agent.transport;
 
 import com.github.kongwu.recorder.common.logger.Logger;
+import com.github.kongwu.recorder.common.transport.PacketDecoder;
+import com.github.kongwu.recorder.common.transport.PacketEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LoggingHandler;
 
 public class AgentServer {
@@ -34,14 +35,14 @@ public class AgentServer {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
                     ch.pipeline().addFirst(new LoggingHandler());
-                    ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,Integer.BYTES,0,Integer.BYTES));
-                    ch.pipeline().addLast(new RequestDecoder());
-                    ch.pipeline().addLast(new ResponseEncoder());
+                    ch.pipeline().addLast(new PacketEncoder());
+                    ch.pipeline().addLast(new PacketDecoder());
                     ch.pipeline().addLast(new AgentServerHandler(AgentServer.this));
                 }
             });
             acceptChannel = serverBootstrap.bind(port).sync().channel();
             started = true;
+            logger.info("Agent Server start completed");
         } catch (InterruptedException e) {
             logger.error("server start failed!", e);
         }
