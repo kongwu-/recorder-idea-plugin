@@ -1,15 +1,20 @@
 package com.github.kongwu.recorder.plugin.action;
 
 import com.github.kongwu.recorder.common.model.InvokeStack;
+import com.github.kongwu.recorder.plugin.utils.PsiUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScopes;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.psi.util.ClassUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -23,18 +28,12 @@ public class JumpToSourceAction extends TreeContextBaseAction {
         Project project = e.getProject();
 
         DefaultMutableTreeTableNode selectedNode = context.getSelectedNode();
-        InvokeStack selectStaCK = (InvokeStack) selectedNode.getUserObject();
 
-        Query<PsiClass> query = AllClassesSearch.search(GlobalSearchScope.allScope(project), project);
-        PsiClass matchedClass = query.filtering(psiClass -> selectStaCK.getMethodDescription().getClassName().equals(psiClass.getQualifiedName())).findFirst();
-        if(matchedClass !=null){
-            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        InvokeStack selectStack = (InvokeStack) selectedNode.getUserObject();
 
-            OpenFileDescriptor openFileDescriptor = new OpenFileDescriptor(project, matchedClass.getNavigationElement().getContainingFile().getVirtualFile(),selectStaCK.getMethodDescription().getLineNumber()-1,0);
+        InvokeStack parentStack = (InvokeStack) selectedNode.getParent().getUserObject();
 
-            fileEditorManager.openTextEditor(openFileDescriptor,true);
-        }
-
+        PsiUtils.openInEditor(parentStack.getMethodDescription().getClassName(),selectStack.getMethodDescription().getLineNumber(),0,project);
     }
 
     public JumpToSourceAction(TraceTreeContext context) {

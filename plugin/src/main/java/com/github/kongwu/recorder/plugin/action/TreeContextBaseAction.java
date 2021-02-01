@@ -16,4 +16,6 @@ public abstract class TreeContextBaseAction extends DumbAwareAction {
     protected DefaultMutableTreeTableNode getSelectedNode(){
         return (DefaultMutableTreeTableNode) context.getTree().getLastSelectedPathComponent();
     }
+
+
 }

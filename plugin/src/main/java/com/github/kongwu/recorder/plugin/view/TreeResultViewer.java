@@ -49,7 +49,7 @@ public class TreeResultViewer implements ResultViewer{
 
                 Tree tree = new Tree(stackNode);
 
-                TraceTreeContext context = new TraceTreeContext(tree);
+                TraceTreeContext context = new TraceTreeContext(tree,project);
 
                 tree.addMouseListener(new TreePopupHandler(context));
                 // disable double-click to expansion

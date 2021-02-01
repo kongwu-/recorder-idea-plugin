@@ -1,6 +1,7 @@
 package com.github.kongwu.recorder.plugin.action;
 
 import com.github.kongwu.recorder.common.model.InvokeStack;
+import com.github.kongwu.recorder.plugin.utils.PsiUtils;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.ui.JBPopupMenu;
@@ -24,7 +25,13 @@ public class TreePopupHandler extends PopupHandler {
     @Override
     public void mousePressed(MouseEvent e) {
         if(e.getClickCount() == 2){
-            System.err.print("double click");
+            DefaultMutableTreeTableNode selectedNode = context.getSelectedNode();
+
+            InvokeStack selectStack = (InvokeStack) selectedNode.getUserObject();
+
+            InvokeStack parentStack = (InvokeStack) selectedNode.getParent().getUserObject();
+
+            PsiUtils.openInEditor(parentStack.getMethodDescription().getClassName(),selectStack.getMethodDescription().getLineNumber(),0,context.getProject());
         }
         super.mousePressed(e);
     }

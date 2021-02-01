@@ -13,19 +13,11 @@ import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 
 public class TraceTreeContext {
     private final Tree tree;
+    private Project project;
 
-    public TraceTreeContext(Tree tree) {
+    public TraceTreeContext(Tree tree, Project project) {
         this.tree = tree;
-    }
-
-    public void jumpToSelected(Project project){
-//        JavaPsiFacade.getInstance().findClasses().for
-//        JBPopupFactory.getInstance().createListPopup();
-//        new BaseListPopupStep<>();
-    }
-
-    public void copySelected(Project project){
-//        project
+        this.project = project;
     }
 
     protected DefaultMutableTreeTableNode getSelectedNode(){
@@ -34,5 +26,13 @@ public class TraceTreeContext {
 
     public Tree getTree() {
         return tree;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
