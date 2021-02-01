@@ -9,7 +9,7 @@ public class AgentTunnelTest {
     private static final int PORT = 10086;
 
     public static void main(String[] args) {
-        AgentTunnel agentTunnel = new AgentTunnel(PORT);
+        AgentTunnel agentTunnel = new AgentTunnel(PORT, null);
 
         agentTunnel.initializeAgentClient();
 

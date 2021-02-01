@@ -17,6 +17,11 @@ shadowJar {
     archiveBaseName.set('agent')
     archiveClassifier.set('')
     archiveVersion.set('')
+
+    //resolve agent class conflict
+    relocate 'io.netty', 'com.github.kongwu.recorder.io.netty'
+    relocate 'org.apache.commons.lang3', 'com.github.kongwu.recorder.org.apache.commons.lang3'
+    relocate 'com.fasterxml.jackson', 'com.github.kongwu.recorder.com.fasterxml.jackson'
 }
 dependencies {
     implementation project(':common')

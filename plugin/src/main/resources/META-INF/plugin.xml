@@ -18,7 +18,11 @@
         <projectService serviceImplementation="com.github.kongwu.recorder.plugin.service.AgentService"/>
 
         <notificationGroup id="RecorderNotificationGroup" displayType="BALLOON"/>
-
+        <toolWindow factoryClass="com.github.kongwu.recorder.plugin.gui.TraceResultToolWindowFactory"
+                    id="TraceResultToolWindow"
+                    anchor="bottom"
+                    canCloseContents="true"
+                    doNotActivateOnStart="true"/>
     </extensions>
 
     <actions>

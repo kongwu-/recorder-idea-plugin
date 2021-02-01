@@ -5,7 +5,9 @@ import com.github.kongwu.recorder.common.model.RequestPacket;
 import com.github.kongwu.recorder.common.model.ResponsePacket;
 import com.github.kongwu.recorder.plugin.view.LogResultViewer;
 import com.github.kongwu.recorder.plugin.view.ResultViewer;
+import com.github.kongwu.recorder.plugin.view.TreeResultViewer;
 import com.google.common.util.concurrent.SettableFuture;
+import com.intellij.openapi.project.Project;
 import io.netty.channel.Channel;
 
 import java.util.Map;
@@ -20,13 +22,16 @@ public class AgentTunnel {
 
     private int port;
 
+    private Project project;
+
     private static Map<Long, SettableFuture<ResponsePacket>> FUTURES = new ConcurrentHashMap<>();
 
     private ResultViewer resultViewer;
 
-    public AgentTunnel(int port) {
+    public AgentTunnel(int port, Project project) {
         this.port = port;
-        this.resultViewer = new LogResultViewer();
+        this.project = project;
+        this.resultViewer = new TreeResultViewer(project);
     }
 
     public synchronized void initializeAgentClient(){

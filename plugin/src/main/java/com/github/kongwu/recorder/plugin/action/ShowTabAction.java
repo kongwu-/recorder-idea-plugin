@@ -16,41 +16,52 @@ import com.intellij.ui.treeStructure.Tree;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 public class ShowTabAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        InvokeStack invokeStack = null;
-        try {
-            invokeStack = objectMapper.readValue("{\"methodDescription\":null,\"children\":[{\"methodDescription\":{\"className\":\"com.github.kongwu.recorder.plugin.agent.Sample\",\"methodName\":\"randomStr\",\"lineNumber\":-1,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":7,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":82,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":278,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":298,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[]}]}]}]}]}]}", InvokeStack.class);
-        } catch (Throwable jsonProcessingException) {
-            jsonProcessingException.printStackTrace();
-        }
-
-        DefaultMutableTreeTableNode stackNode = createTreeNode(invokeStack);
-
-        Tree tree = new Tree(stackNode);
-
-//        tree.addMouseListener();
+//        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 //
-//        //单元格渲染，或者叫行渲染方式？
-//        tree.setCellRenderer();
-
-        Content content = contentFactory.createContent(tree,"Trace result tree",false);
-
-        ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).registerToolWindow(RegisterToolWindowTask.closable("hhh", AllIcons.Nodes.AbstractClass));
-
-        ContentManager contentManager = toolWindow.getContentManager();
-
-        contentManager.addContent(content);
-
-        contentManager.setSelectedContent(content);
-
-        toolWindow.show();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        InvokeStack invokeStack = null;
+//        try {
+//            invokeStack = objectMapper.readValue("{\"methodDescription\":null,\"children\":[{\"methodDescription\":{\"className\":\"com.github.kongwu.recorder.plugin.agent.Sample\",\"methodName\":\"randomStr\",\"lineNumber\":-1,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":7,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":82,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":278,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[{\"methodDescription\":{\"className\":\"org/apache/commons/lang3/RandomStringUtils\",\"methodName\":\"random\",\"lineNumber\":298,\"throwExp\":null,\"mark\":null,\"hashOfCallStack\":0,\"line\":0,\"highlighted\":false,\"throw\":null},\"children\":[]}]}]}]}]}]}", InvokeStack.class);
+//        } catch (Throwable jsonProcessingException) {
+//            jsonProcessingException.printStackTrace();
+//        }
+//
+//        DefaultMutableTreeTableNode stackNode = createTreeNode(invokeStack);
+//
+//        Tree tree = new Tree(stackNode);
+//
+//        tree.addMouseListener(new TreePopupHandler(tree));
+//        // disable double-click to expansion
+//        tree.setToggleClickCount(-1);
+//
+//
+////
+////        //单元格渲染，或者叫行渲染方式？
+////        tree.setCellRenderer();
+//
+//        Content content = contentFactory.createContent(tree,"Trace result tree",false);
+//
+//        ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).getToolWindow("TraceResultToolWindow");
+//
+//        ContentManager contentManager = toolWindow.getContentManager();
+//
+//        contentManager.addContent(content);
+//
+//        contentManager.setSelectedContent(content);
+//
+//        toolWindow.show();
+//
+//        int rowCount = tree.getRowCount();
+//        //注意，这里rowCount必须每次获取，因为展开后rowCount是变化的，row count 不是 node count
+//        for (int i = 0; i < tree.getRowCount(); i++) {
+//            tree.expandRow(i);
+//        }
     }
 
     private DefaultMutableTreeTableNode createTreeNode(InvokeStack invokeStack) {

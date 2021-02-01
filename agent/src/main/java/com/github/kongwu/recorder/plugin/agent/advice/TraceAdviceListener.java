@@ -4,7 +4,10 @@ import com.github.kongwu.recorder.common.logger.Logger;
 import com.github.kongwu.recorder.plugin.agent.result.DumpTraceResultResolver;
 import com.github.kongwu.recorder.plugin.agent.result.TraceResultResolver;
 import com.github.kongwu.recorder.plugin.agent.model.*;
+import com.github.kongwu.recorder.plugin.agent.utils.StringUtils;
 import com.github.kongwu.recorder.plugin.agent.utils.ThreadLocalWatch;
+
+import java.util.List;
 
 public class TraceAdviceListener implements AdviceListener{
 
@@ -112,6 +115,7 @@ public class TraceAdviceListener implements AdviceListener{
         //通过深度来判断，是否完全退出trace的入口方法
         if (--traceEntity.deep == 0) {
             try {
+                traceEntity.tree.trim();
                 traceResultResolver.resolve(traceEntity.tree);
             } catch (Throwable e) {
                 logger.error("resolve result failed!",e);
@@ -120,7 +124,4 @@ public class TraceAdviceListener implements AdviceListener{
             }
         }
     }
-
-
-
 }
