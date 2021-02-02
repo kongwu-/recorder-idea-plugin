@@ -1,6 +1,9 @@
 package com.github.kongwu.recorder.plugin.agent.result;
 
-import com.github.kongwu.recorder.plugin.agent.model.*;
+import com.github.kongwu.recorder.common.model.MethodNode;
+import com.github.kongwu.recorder.common.model.ThrowNode;
+import com.github.kongwu.recorder.common.model.TraceNode;
+import com.github.kongwu.recorder.common.model.TraceTree;
 
 import java.util.List;
 

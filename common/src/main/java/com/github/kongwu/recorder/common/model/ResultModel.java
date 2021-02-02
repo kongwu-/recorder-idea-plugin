@@ -1,4 +1,4 @@
-package com.github.kongwu.recorder.plugin.agent.model;
+package com.github.kongwu.recorder.common.model;
 
 /**
  * Command execute result

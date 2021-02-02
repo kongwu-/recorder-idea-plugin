@@ -1,7 +1,6 @@
 package com.github.kongwu.recorder.plugin.agent.model;
 
-import com.github.kongwu.recorder.common.model.InvokeStack;
-import com.github.kongwu.recorder.common.model.MethodDescription;
+import com.github.kongwu.recorder.common.model.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,10 @@
 package com.github.kongwu.recorder.plugin.agent.advice;
 
 import com.github.kongwu.recorder.common.logger.Logger;
+import com.github.kongwu.recorder.common.model.TraceEntity;
 import com.github.kongwu.recorder.plugin.agent.result.DumpTraceResultResolver;
 import com.github.kongwu.recorder.plugin.agent.result.TraceResultResolver;
-import com.github.kongwu.recorder.plugin.agent.model.*;
-import com.github.kongwu.recorder.plugin.agent.utils.StringUtils;
 import com.github.kongwu.recorder.plugin.agent.utils.ThreadLocalWatch;
-
-import java.util.List;
 
 public class TraceAdviceListener implements AdviceListener{
 

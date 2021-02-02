@@ -51,9 +51,9 @@ public class TreeResultViewer implements ResultViewer{
 
                 TraceTreeContext context = new TraceTreeContext(tree);
 
-                tree.addMouseListener(new TreePopupHandler(context));
-                // disable double-click to expansion
-                tree.setToggleClickCount(-1);
+                    tree.addMouseListener(new TreePopupHandler(context));
+                    // disable double-click to expansion
+                    tree.setToggleClickCount(-1);
 
                 ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 

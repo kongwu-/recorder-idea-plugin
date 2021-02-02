@@ -1,8 +1,8 @@
-package com.github.kongwu.recorder.plugin.agent.model;
+package com.github.kongwu.recorder.common.model;
 
 
 
-import com.github.kongwu.recorder.plugin.agent.utils.StringUtils;
+import com.github.kongwu.recorder.common.utils.StringUtils;
 
 import java.util.List;
 

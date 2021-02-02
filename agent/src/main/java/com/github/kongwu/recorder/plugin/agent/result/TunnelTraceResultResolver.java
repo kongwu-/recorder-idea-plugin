@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kongwu.recorder.common.logger.Logger;
 import com.github.kongwu.recorder.common.model.PacketConstant;
 import com.github.kongwu.recorder.common.model.RequestPacket;
-import com.github.kongwu.recorder.common.model.ResponsePacket;
 import com.github.kongwu.recorder.plugin.agent.model.TraceResultConverter;
-import com.github.kongwu.recorder.plugin.agent.model.TraceTree;
+import com.github.kongwu.recorder.common.model.TraceTree;
 import io.netty.channel.Channel;
 
 public class TunnelTraceResultResolver implements TraceResultResolver{
