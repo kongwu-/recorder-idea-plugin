@@ -8,6 +8,7 @@ java {
     }
 }
 compileJava.options.encoding = 'UTF-8'
+
 dependencies {
     implementation project(':common')
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'

@@ -1,4 +1,4 @@
-package com.github.kongwu.recorder.plugin.agent.model;
+package com.github.kongwu.recorder.common.model;
 
 /**
  * Data model of TraceCommand
