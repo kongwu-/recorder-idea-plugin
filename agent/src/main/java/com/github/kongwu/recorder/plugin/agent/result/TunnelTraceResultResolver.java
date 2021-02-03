@@ -26,7 +26,7 @@ public class TunnelTraceResultResolver implements TraceResultResolver{
     public void resolve(TraceTree traceTree) {
         try {
             logger.info("resolving trace result");
-            String body = objectMapper.writeValueAsString(traceResultConverter.convert(traceTree));
+            String body = objectMapper.writeValueAsString(traceTree.getRoot());
             channel.writeAndFlush(new RequestPacket(PacketConstant.EVENT_TRACE,body));
             //ignore reply...
         } catch (Exception e) {

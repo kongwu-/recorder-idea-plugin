@@ -1,5 +1,7 @@
 package com.github.kongwu.recorder.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,9 @@ import java.util.List;
  */
 public class TraceNode {
 
+    @JsonIgnore
     public TraceNode parent;
+
     public List<TraceNode> children;
 
     /**

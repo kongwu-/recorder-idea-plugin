@@ -3,8 +3,9 @@ package com.github.kongwu.recorder.plugin.view;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kongwu.recorder.common.model.InvokeStack;
-import com.github.kongwu.recorder.plugin.action.TraceTreeContext;
-import com.github.kongwu.recorder.plugin.action.TreePopupHandler;
+import com.github.kongwu.recorder.common.model.TraceNode;
+import com.github.kongwu.recorder.plugin.action.TraceContext;
+import com.github.kongwu.recorder.plugin.gui.TraceResultPanel;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -26,38 +27,36 @@ public class TreeResultViewer implements ResultViewer{
 
     private Logger logger = Logger.getInstance(TreeResultViewer.class);
 
+    private TraceContext traceContext;
+
+    private volatile boolean contentCreated = false;
+
     public TreeResultViewer(Project project) {
         this.project = project;
     }
 
     @Override
-    public void draw(String body) {
+    public synchronized void draw(String body) {
 
+        if(traceContext == null){
+            traceContext = new TraceContext(project);
+        }
 
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
+        ApplicationManager.getApplication().invokeLater(() -> {
 
-                InvokeStack invokeStack = null;
-                try {
-                    invokeStack = objectMapper.readValue(body, InvokeStack.class);
-                } catch (JsonProcessingException e) {
-                    logger.error(e);
-                }
+            TraceNode traceNode = null;
+            try {
+                traceNode = objectMapper.readValue(body, TraceNode.class);
+            } catch (JsonProcessingException e) {
+                logger.error(e);
+            }
 
-                DefaultMutableTreeTableNode stackNode = createTreeNode(invokeStack);
+            traceContext.addInvokeStack(traceNode);
 
-                Tree tree = new Tree(stackNode);
+            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 
-                TraceTreeContext context = new TraceTreeContext(tree,project);
-
-                    tree.addMouseListener(new TreePopupHandler(context));
-                    // disable double-click to expansion
-                    tree.setToggleClickCount(-1);
-
-                ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-
-                Content content = contentFactory.createContent(tree,"Trace result tree",false);
+            if(!contentCreated){
+                Content content = contentFactory.createContent(new TraceResultPanel(traceContext).getRootPanel(),"Trace result tree",false);
 
                 ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("TraceResultToolWindow");
 
@@ -69,14 +68,9 @@ public class TreeResultViewer implements ResultViewer{
 
                 toolWindow.show();
 
-                //注意，这里rowCount必须每次获取，因为展开后rowCount是变化的，row count 不是 node count
-                for (int i = 0; i < tree.getRowCount(); i++) {
-                    tree.expandRow(i);
-                }
+                contentCreated = true;
             }
         });
-
-
     }
 
     private DefaultMutableTreeTableNode createTreeNode(InvokeStack invokeStack) {
