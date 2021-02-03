@@ -101,6 +101,7 @@ public class TraceAdviceListener implements AdviceListener{
         if (traceEntity == null) {
             traceEntity = new TraceEntity();
             threadBoundEntity.set(traceEntity);
+
         }
         return traceEntity;
     }

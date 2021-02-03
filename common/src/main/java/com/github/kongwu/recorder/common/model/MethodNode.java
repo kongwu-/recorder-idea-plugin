@@ -35,6 +35,8 @@ public class MethodNode extends TraceNode {
     private long totalCost = 0;
     private long times = 0;
 
+    public MethodNode() {
+    }
 
     public MethodNode(String className, String methodName, int lineNumber, boolean isInvoking) {
         super("method");

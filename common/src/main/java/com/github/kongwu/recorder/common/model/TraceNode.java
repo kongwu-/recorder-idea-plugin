@@ -1,6 +1,7 @@
 package com.github.kongwu.recorder.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * Abstract Node of TraceCommand
  * @author gongdewei 2020/4/28
  */
+@JsonSubTypes({@JsonSubTypes.Type(ThreadNode.class),@JsonSubTypes.Type(MethodNode.class),@JsonSubTypes.Type(ThrowNode.class)})
 public class TraceNode {
 
     @JsonIgnore
@@ -32,6 +34,9 @@ public class TraceNode {
 
     public TraceNode(String type) {
         this.type = type;
+    }
+
+    public TraceNode() {
     }
 
     public void addChild(TraceNode child) {
