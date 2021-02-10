@@ -1,10 +1,7 @@
 package com.github.kongwu.recorder.plugin.agent.result;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.kongwu.recorder.common.logger.Logger;
 import com.github.kongwu.recorder.common.model.PacketConstant;
 import com.github.kongwu.recorder.common.model.RequestPacket;
@@ -30,14 +27,8 @@ public class TunnelTraceResultResolver implements TraceResultResolver{
     public void resolve(TraceTree traceTree) {
         try {
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder().build();
-            objectMapper.activateDefaultTyping(ptv); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
-            objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
-
-
             logger.info("resolving trace result");
-            String body = objectMapper.writeValueAsString(traceTree.getRoot());
+            String body = JSON.toJSONString(traceTree.getRoot(), SerializerFeature.WriteClassName);
             channel.writeAndFlush(new RequestPacket(PacketConstant.EVENT_TRACE,body));
             //ignore reply...
         } catch (Exception e) {

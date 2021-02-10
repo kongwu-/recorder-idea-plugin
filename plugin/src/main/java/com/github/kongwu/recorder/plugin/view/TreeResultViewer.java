@@ -1,9 +1,6 @@
 package com.github.kongwu.recorder.plugin.view;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.alibaba.fastjson.JSON;
 import com.github.kongwu.recorder.common.model.InvokeStack;
 import com.github.kongwu.recorder.common.model.TraceNode;
 import com.github.kongwu.recorder.plugin.action.TraceContext;
@@ -25,8 +22,6 @@ public class TreeResultViewer implements ResultViewer{
 
     private Project project;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     private Logger logger = Logger.getInstance(TreeResultViewer.class);
 
     private TraceContext traceContext;
@@ -43,18 +38,9 @@ public class TreeResultViewer implements ResultViewer{
         if(traceContext == null){
             traceContext = new TraceContext(project);
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder().build();
-        objectMapper.activateDefaultTyping(ptv); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
-        objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
         ApplicationManager.getApplication().invokeLater(() -> {
 
-            TraceNode traceNode = null;
-            try {
-                traceNode = objectMapper.readValue(body, TraceNode.class);
-            } catch (JsonProcessingException e) {
-                logger.error(e);
-            }
+            TraceNode traceNode = JSON.parseObject(body,TraceNode.class);
 
             traceContext.addInvokeStack(traceNode);
 

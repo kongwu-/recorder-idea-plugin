@@ -47,9 +47,10 @@ public class SpyImpl extends SpyAPI.AbstractSpy {
 
     @Override
     public void atBeforeInvoke(Class<?> clazz, String invokeInfo, Object target) {
+        System.out.println("###  "+invokeInfo+"：：：target="+target.getClass());
         String[] splitInvokeInfo = invokeInfo.split(Pattern.quote("|"));
         try {
-            Enhancer.enhance(splitInvokeInfo[0].replace("/","."),false);
+//            Enhancer.enhance(splitInvokeInfo[0].replace("/","."),false);
             getAdviceListener().invokeBeforeTracing(splitInvokeInfo[0],splitInvokeInfo[1],splitInvokeInfo[2],Integer.parseInt(splitInvokeInfo[3]));
         } catch (Throwable e) {
             logger.error("invokeBeforeTracing failed!",e);

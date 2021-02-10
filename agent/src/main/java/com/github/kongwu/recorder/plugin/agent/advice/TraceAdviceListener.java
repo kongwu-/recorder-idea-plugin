@@ -49,6 +49,7 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void before(Class<?> clazz, String methodName, String methodDesc, Object target, Object[] args) throws Throwable {
+        logger.info("before "+clazz.getName()+":"+methodName);
         TraceEntity traceEntity = threadLocalTraceEntity();
 
         traceEntity.deep++;
@@ -60,6 +61,7 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void afterReturning(Class<?> clazz, String methodName, String methodDesc, Object target, Object[] args, Object returnObject) throws Throwable {
+        logger.info("afterReturning "+clazz.getName()+":"+methodName);
         threadLocalTraceEntity().tree.end();
         finishing();
     }
@@ -73,7 +75,7 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void invokeBeforeTracing(String tracingClassName, String tracingMethodName, String tracingMethodDesc, int tracingLineNumber) throws Throwable {
-        logger.info("invokeBeforeTracing: "+tracingMethodName);
+        logger.info("invokeBeforeTracing: "+"tracingClassName:"+tracingMethodName+":"+tracingMethodName);
         TraceEntity traceEntity = threadLocalTraceEntity();
 
         traceEntity.deep++;
@@ -92,6 +94,7 @@ public class TraceAdviceListener implements AdviceListener{
 
     @Override
     public void invokeAfterTracing(String tracingClassName, String tracingMethodName, String tracingMethodDesc, int tracingLineNumber) throws Throwable {
+        logger.info("invokeAfterTracing: "+"tracingClassName:"+tracingMethodName+":"+tracingMethodName);
         threadLocalTraceEntity().tree.end();
         finishing();
     }

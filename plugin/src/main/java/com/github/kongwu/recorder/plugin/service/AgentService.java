@@ -185,8 +185,8 @@ public class AgentService {
     }
 
     private Optional<String> getAgentPath() {
-        return Optional.of("C:\\Users\\jiang\\IdeaProjects\\recorder-idea-plugin\\agent\\build\\libs\\agent.jar");
-//        return Optional.of("/Users/jiangxin/IdeaProjects/recorder-idea-plugin/agent/build/libs/agent.jar");
+//        return Optional.of("C:\\Users\\jiang\\IdeaProjects\\recorder-idea-plugin\\agent\\build\\libs\\agent.jar");
+        return Optional.of("/Users/jiangxin/IdeaProjects/recorder-idea-plugin/agent/build/libs/agent.jar");
 //        try {
 //            IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(Constants.PLUGIN_NAME));
 //            Path pluginPath = plugin.getPluginPath();

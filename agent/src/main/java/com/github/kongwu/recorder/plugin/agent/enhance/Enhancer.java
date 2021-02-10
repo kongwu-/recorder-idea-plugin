@@ -151,7 +151,102 @@ public class Enhancer implements ClassFileTransformer {
 
     }
 
-    private boolean isIgnore(MethodNode methodNode) {
+    public static synchronized byte[] enhance(ClassLoader classLoader, String className, byte[] classfileBuffer) throws ClassNotFoundException {
+        className = className.replace("/",".");
+        if(className.startsWith("com.github.kongwu.recorder")){
+            System.out.println("break internal class...");
+            return null;
+        }
+        System.out.println(className);
+        ClassNode classNode = new ClassNode(Opcodes.ASM9);
+        ClassReader classReader = AsmUtils.toClassNode(classfileBuffer, classNode);
+        // remove JSR https://github.com/alibaba/arthas/issues/1304
+        classNode = AsmUtils.removeJSRInstructions(classNode);
+
+        // 生成增强字节码
+        DefaultInterceptorClassParser defaultInterceptorClassParser = new DefaultInterceptorClassParser();
+
+        final List<InterceptorProcessor> interceptorProcessors = new ArrayList<InterceptorProcessor>();
+
+            interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyInterceptor1.class));
+            interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyInterceptor2.class));
+            interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyInterceptor3.class));
+
+            interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyTraceExcludeJDKInterceptor1.class));
+        interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyTraceExcludeJDKInterceptor2.class));
+        interceptorProcessors.addAll(defaultInterceptorClassParser.parse(SpyInterceptors.SpyTraceExcludeJDKInterceptor3.class));
+
+        List<MethodNode> matchedMethods = new ArrayList<com.alibaba.deps.org.objectweb.asm.tree.MethodNode>();
+        for (MethodNode methodNode : classNode.methods) {
+            if (!isIgnore(methodNode)) {
+                matchedMethods.add(methodNode);
+            }
+        }
+
+        System.out.println("continue.... ");
+
+        // 用于检查是否已插入了 spy函数，如果已有则不重复处理
+        GroupLocationFilter groupLocationFilter = new GroupLocationFilter();
+
+        LocationFilter enterFilter = new InvokeContainLocationFilter(Type.getInternalName(SpyAPI.class), "atEnter",
+                LocationType.ENTER);
+        LocationFilter existFilter = new InvokeContainLocationFilter(Type.getInternalName(SpyAPI.class), "atExit",
+                LocationType.EXIT);
+        LocationFilter exceptionFilter = new InvokeContainLocationFilter(Type.getInternalName(SpyAPI.class),
+                "atExceptionExit", LocationType.EXCEPTION_EXIT);
+
+        groupLocationFilter.addFilter(enterFilter);
+        groupLocationFilter.addFilter(existFilter);
+        groupLocationFilter.addFilter(exceptionFilter);
+
+        LocationFilter invokeBeforeFilter = new InvokeCheckLocationFilter(Type.getInternalName(SpyAPI.class),
+                "atBeforeInvoke", LocationType.INVOKE);
+        LocationFilter invokeAfterFilter = new InvokeCheckLocationFilter(Type.getInternalName(SpyAPI.class),
+                "atInvokeException", LocationType.INVOKE_COMPLETED);
+        LocationFilter invokeExceptionFilter = new InvokeCheckLocationFilter(Type.getInternalName(SpyAPI.class),
+                "atInvokeException", LocationType.INVOKE_EXCEPTION_EXIT);
+        groupLocationFilter.addFilter(invokeBeforeFilter);
+        groupLocationFilter.addFilter(invokeAfterFilter);
+        groupLocationFilter.addFilter(invokeExceptionFilter);
+
+        System.out.println("add filter.... ");
+        try {
+        for (MethodNode methodNode : matchedMethods) {
+            if (AsmUtils.isNative(methodNode)) {
+                continue;
+            }
+            if(AsmUtils.containsMethodInsnNode(methodNode, Type.getInternalName(SpyAPI.class), "atBeforeInvoke")){
+                continue;
+            }
+            MethodProcessor methodProcessor = new MethodProcessor(classNode, methodNode,groupLocationFilter);
+            for (InterceptorProcessor interceptor : interceptorProcessors) {
+
+                    List<Location> locations = interceptor.process(methodProcessor);
+
+
+            }
+        }
+            System.out.println("filter done....");
+
+//
+//        // https://github.com/alibaba/arthas/issues/1223 , V1_5 的major version是49
+//        if (AsmUtils.getMajorVersion(classNode.version) < 49) {
+//            classNode.version = AsmUtils.setMajorVersion(classNode.version, 49);
+//        }
+
+        byte[] enhanceClassByteArray = AsmUtils.toBytes(classNode, classLoader, classReader);
+            System.out.println("before: "+classfileBuffer.length+", after: "+enhanceClassByteArray.length);
+            return enhanceClassByteArray;
+        } catch (Throwable e) {
+            System.err.println("拔错了");
+//            logger.error(String.format("enhancer error, class: %s, method: %s, interceptor: %s", classNode.name, methodNode.name, interceptor.getClass().getName()), e);
+        }
+        return null;
+
+
+    }
+
+    private static boolean isIgnore(MethodNode methodNode) {
         //add method chooser
         return null == methodNode || isAbstract(methodNode.access)
                 || methodNode.name.equals("<clinit>");
@@ -160,7 +255,7 @@ public class Enhancer implements ClassFileTransformer {
     /**
      * 是否抽象属性
      */
-    private boolean isAbstract(int access) {
+    private static boolean isAbstract(int access) {
         return (Opcodes.ACC_ABSTRACT & access) == Opcodes.ACC_ABSTRACT;
     }
 }

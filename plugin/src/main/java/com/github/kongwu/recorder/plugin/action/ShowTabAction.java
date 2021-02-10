@@ -1,7 +1,5 @@
 package com.github.kongwu.recorder.plugin.action;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kongwu.recorder.common.model.InvokeStack;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;

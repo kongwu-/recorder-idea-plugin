@@ -21,7 +21,7 @@ shadowJar {
     //resolve agent class conflict
     relocate 'io.netty', 'com.github.kongwu.recorder.io.netty'
     relocate 'org.apache.commons.lang3', 'com.github.kongwu.recorder.org.apache.commons.lang3'
-    relocate 'com.fasterxml.jackson', 'com.github.kongwu.recorder.com.fasterxml.jackson'
+    relocate 'com.alibaba', 'com.github.kongwu.recorder.com.alibaba'
 }
 dependencies {
     implementation project(':common')

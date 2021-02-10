@@ -1,6 +1,7 @@
 package com.github.kongwu.recorder.plugin.gui;
 
 import com.github.kongwu.recorder.common.model.ThreadNode;
+import com.github.kongwu.recorder.common.model.TraceNode;
 import com.github.kongwu.recorder.plugin.action.TraceContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.VerticalFlowLayout;
@@ -15,9 +16,13 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import java.awt.*;
+import java.util.List;
 
 import static com.intellij.ui.SimpleTextAttributes.*;
 
@@ -47,7 +52,9 @@ public class TraceResultPanel implements Disposable {
     public void initializeGUI() {
         rootPanel = new BorderLayoutPanel();
 
-        toolbarPane = new JBPanel<>(new VerticalFlowLayout());
+        toolbarPane = new BorderLayoutPanel();
+
+        toolbarPane.setBorder(JBUI.Borders.empty());
 
         toolbarPane.add(new JBTextField("typing..."));
         rootPanel.addToTop(toolbarPane);
@@ -60,13 +67,9 @@ public class TraceResultPanel implements Disposable {
         leftPane.setViewportBorder(JBUI.Borders.empty());
         leftPane.setBorder(JBUI.Borders.empty());
 
-        DefaultListModel listModel =  new DefaultListModel();
-        for (int i = 0; i < 100; i++) {
-            listModel.addElement("io.netty.xxx.XXClass:MethodA()");
-        }
-
-
         traceResultList = new JBList(traceContext.getInvokeStackListModel());
+        traceResultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 
         traceResultList.setCellRenderer(new ListCellRenderer<ThreadNode>() {
             @Override
@@ -87,13 +90,13 @@ public class TraceResultPanel implements Disposable {
                 cellPanel.addToCenter(new ColoredListCellRenderer<ThreadNode>() {
                     @Override
                     protected void customizeCellRenderer(@NotNull JList<? extends ThreadNode> list, ThreadNode value, int index, boolean selected, boolean hasFocus) {
-                        append(value.getThreadName(), REGULAR_BOLD_ATTRIBUTES, 50, 2);
+                        append(String.valueOf(value.getThreadName()), REGULAR_BOLD_ATTRIBUTES, 50, 2);
                     }
                 }.getListCellRendererComponent(list, value, index, selected, cellHasFocus));
                 cellPanel.addToRight(new ColoredListCellRenderer<ThreadNode>() {
                     @Override
                     protected void customizeCellRenderer(@NotNull JList<? extends ThreadNode> list, ThreadNode value, int index, boolean selected, boolean hasFocus) {
-                        append(value.getMark(), GRAYED_ATTRIBUTES, 50, 4);
+                        append(String.valueOf(value.getMark()), GRAYED_ATTRIBUTES, 50, 4);
                     }
                 }.getListCellRendererComponent(list, value, index, selected, cellHasFocus));
                 return cellPanel;
@@ -108,15 +111,19 @@ public class TraceResultPanel implements Disposable {
         rightPane.setViewportBorder(JBUI.Borders.empty());
         rightPane.setBorder(JBUI.Borders.empty());
 
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
-        rootNode.setUserObject("root");
-
-        rootNode.add(new DefaultMutableTreeNode("childa"));
-
-        traceResultTree = new Tree(rootNode);
+        traceResultTree = new Tree();
 
         rightPane.setViewportView(traceResultTree);
 
+        traceResultList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                JBList jbList = (JBList)e.getSource();
+                TraceNode selectedValue = (TraceNode)jbList.getSelectedValue();
+                traceResultTree.setModel(new DefaultTreeModel(createRootTreeNode(selectedValue)));
+                expandInvokeTree();
+            }
+        });
 
 
         splitter.setFirstComponent(leftPane);
@@ -141,6 +148,29 @@ public class TraceResultPanel implements Disposable {
     @Override
     public void dispose() {
 
+    }
+
+    private void expandInvokeTree(){
+        for (int i = 0; i < traceResultTree.getRowCount(); i++) {
+            traceResultTree.expandRow(i);
+        }
+    }
+
+    private DefaultMutableTreeNode createRootTreeNode(TraceNode traceNode){
+        DefaultMutableTreeNode rootTreeNode = new DefaultMutableTreeNode(traceNode);
+        recursiveCreate(rootTreeNode,traceNode);
+        return rootTreeNode;
+    }
+
+    private void recursiveCreate(DefaultMutableTreeNode treeNode,TraceNode traceNode){
+        List<TraceNode> children = traceNode.children;
+        if(children!=null){
+            for (TraceNode child : children) {
+                DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+                recursiveCreate(childNode,child);
+                treeNode.add(childNode);
+            }
+        }
     }
 
     public JPanel getRootPanel() {

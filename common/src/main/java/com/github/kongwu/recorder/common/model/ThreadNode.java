@@ -96,4 +96,18 @@ public class ThreadNode extends TraceNode {
     public void setRpcId(String rpcId) {
         this.rpcId = rpcId;
     }
+
+    @Override
+    public String toString() {
+        return "ThreadNode{" +
+                "threadName='" + threadName + '\'' +
+                ", threadId=" + threadId +
+                ", daemon=" + daemon +
+                ", priority=" + priority +
+                ", classloader='" + classloader + '\'' +
+                ", timestamp=" + timestamp +
+                ", traceId='" + traceId + '\'' +
+                ", rpcId='" + rpcId + '\'' +
+                '}';
+    }
 }

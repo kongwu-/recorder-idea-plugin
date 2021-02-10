@@ -9,9 +9,9 @@ public class PacketConstant {
     public static final byte EVENT_TRACE = 0x01;
     public static final byte EVENT_SHUTDOWN = 0x02;
 
-    public static final byte STATE_OK = 1;
+    public static final byte STATE_OK = 0x01;
 
-    public static final byte STATE_FAIL = 0;
+    public static final byte STATE_FAIL = 0x00;
 
     /* response */
     public static final byte RESPONSE_TRACE = 1;

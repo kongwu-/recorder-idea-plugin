@@ -4,6 +4,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 一个迷你的日志工具，供agent使用
@@ -12,7 +13,7 @@ import java.util.*;
  * agent日志直接输出至控制台
  */
 public class Logger {
-    private static final Map<Class,Logger> loggerCache = new HashMap<>();
+    private static final Map<Class,Logger> loggerCache = new ConcurrentHashMap<>();
 
     private String name;
 

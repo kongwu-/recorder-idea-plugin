@@ -147,4 +147,22 @@ public class MethodNode extends TraceNode {
     public void setInvoking(boolean invoking) {
         isInvoking = invoking;
     }
+
+    @Override
+    public String toString() {
+        return "MethodNode{" +
+                "className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", isThrow=" + isThrow +
+                ", throwExp='" + throwExp + '\'' +
+                ", isInvoking=" + isInvoking +
+                ", beginTimestamp=" + beginTimestamp +
+                ", endTimestamp=" + endTimestamp +
+                ", minCost=" + minCost +
+                ", maxCost=" + maxCost +
+                ", totalCost=" + totalCost +
+                ", times=" + times +
+                '}';
+    }
 }
